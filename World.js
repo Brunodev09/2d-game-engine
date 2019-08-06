@@ -50,17 +50,22 @@ class World {
 
     slopes() {
 
-        let slopeX = 9;
-        let slopeY = 7;
+        let minPos = 9;
+        let maxPos = 7;
         // Dirt and top of the world - Time of iteractions must be defined by the width
         // Since I'm selecting the top n times, I need it to fill at least the whole width
         for (let x = 0; x < this.worldSize.sizeX; x++) {
             let pos = r(this.tilesY);
             // Position cannot be zero (No dirt in the sky plz)
             if (!pos) pos = r(this.tilesY);
-            if (pos >= 9) pos = slopeX - r(6, 1);
-            if (pos <= 7) pos = slopeY + r(4, 1);
+            if (pos >= maxPos) pos = maxPos - r(6, 1);
+            if (pos <= minPos) pos = minPos + r(4, 1);
             this.topWorld[x] = pos;
+        }
+        for (let i = 0; i < this.worldSize.sizeX; i++) {
+            for (let j = 0; j < this.worldSize.sizeY; j++) {
+                if (j > this.topWorld[i] + 1) this.map[i][j] = "stone";
+            }
         }
     }
 
@@ -72,10 +77,9 @@ class World {
                 if (j > this.topWorld[i] + 5) {
 
                     this.map[i][j] = r(10, 1);
-                    if (this.map[i][j] <= 5) this.map[i][j] = "stone";
+                    if (this.map[i][j] <= 5) this.map[i][j] = null;
                     
                 } 
-                else this.map[i][j] = "stone";
             }
         }
     }
@@ -83,7 +87,9 @@ class World {
     rooms() {
         for (let i = 0; i < this.worldSize.sizeX; i++) {
             for (let j = 0; j < this.worldSize.sizeY; j++) {
-
+                if (j > this.topWorld[i] + 5) {
+                    if (!isNaN(this.map[i][j])) this.room(i, j);
+                }
             }
         }
     }
@@ -92,7 +98,7 @@ class World {
     room(vecX, vecY) {
         if (!this.map[vecX] || (!this.map[vecX + 1]) || (!this.map[vecX - 1])) return;
         if (!this.map[vecY] || (!this.map[vecY + 1]) || (!this.map[vecY - 1])) return;
-        if (!(r(5, 1) <= 3)) {
+        if (!(r(10, 1) === 3)) {
             this.map[vecX][vecY] = "stone";
             return;
         }
@@ -111,16 +117,14 @@ class World {
         for (let i = 0; i < (this.worldSize.sizeX); i++) {
             for (let j = 0; j < (this.worldSize.sizeY); j++) {
 
-                // if (j >= 0 && j <= (tilesY / 2)) drawRect(i * (tileW + 1), j * (tileH + 1), tileW, tileH, 'white');
-                // else if (j > ((tilesY / 2) + 1) && map[i][j] >= 6) drawRect(i * (tileW + 1), j * (tileH + 1), tileW, tileH, 'black');
-                // else drawRect(i * (tileW + 1), j * (tileH + 1), tileW, tileH, 'grey');
+                if (j === this.topWorld[i]) World.addTexture("grass", i * (this.tileW + 1), j * (this.tileH + 1), this.tileW, this.tileH);
 
-                if (j === this.topWorld[i]) World.addTexture("dirt", i * (this.tileW + 1), j * (this.tileH + 1), this.tileW, this.tileH);
+                if (j === (this.topWorld[i] + 1)) World.addTexture("dirt", i * (this.tileW + 1), j * (this.tileH + 1), this.tileW, this.tileH);
 
                 // Stone rendering after 5 blocks from stone (+5 couting in height)
                 if (j > (this.topWorld[i])) {
                     if (this.map[i][j] === "stone") World.addTexture("stone", i * (this.tileW + 1), j * (this.tileH + 1), this.tileW, this.tileH);
-                    else if (this.map[i][j] === "room") World.addTexture("room", i * (this.tileW + 1), j * (this.tileH + 1), this.tileW, this.tileH);
+                    // else if (this.map[i][j] === "room") World.addTexture("room", i * (this.tileW + 1), j * (this.tileH + 1), this.tileW, this.tileH);
                 }
             }
         }
@@ -137,6 +141,9 @@ class World {
             case "room":
                 render.rect(x, y, w, h, "yellow");
                 break;
+            case "grass":
+                render.rect(x, y, w, h, "green");
+                break;    
             default:
                 render.rect(x, y, w, h, "purple");
                 break;
