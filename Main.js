@@ -1,5 +1,5 @@
 let c, cx;
-let gc, world, render;
+let gc, world, render, land;
 
 window.onload = function () {
 
@@ -9,8 +9,7 @@ window.onload = function () {
     render = new Render(c, cx);
 
     world = new World(c.width, c.height, render);
-    world.fillMatrixes();
-    world.generator();
+    land = new Landscape(20, 20, 1, 1);
     
     gc = new GameController(world, render);
     gc.start();
