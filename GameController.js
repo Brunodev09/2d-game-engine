@@ -6,7 +6,7 @@ class GameController {
     constructor(worldInstance, renderInstance) {
         this.fps = 100;
         this.worldInstance = worldInstance;
-        this.renderInstance = renderInstance
+        this.renderInstance = renderInstance;
         window.references.gc = this;
     }
 
@@ -26,11 +26,18 @@ class GameController {
     }
 
     keyboardController() {
-        document.addEventListener('keydown', (event) => {
+        document.addEventListener('keyup', (event) => {
             if (event.keyCode === 37) {
-
-            } else if (event.keyCode === 39) {
-
+                // left arrow
+                this.worldInstance.leftFlag = false;
+                this.worldInstance.rightFlag = true;
+                this.worldInstance.right++;
+            } 
+            else if (event.keyCode === 39) {
+                // right arrow
+                this.worldInstance.leftFlag = true;
+                this.worldInstance.rightFlag = false;
+                this.worldInstance.left++;
             }
         });
     }

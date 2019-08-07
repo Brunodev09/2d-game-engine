@@ -13,5 +13,5 @@ class Tools {
         return new Array(size);
     }
 }
-
+// Tool singleton
 window.tools = new Tools();

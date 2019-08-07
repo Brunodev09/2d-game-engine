@@ -16,6 +16,15 @@ class World {
         this.tilesX = f(this.width / this.tileW);
         this.tilesY = f(this.height / this.tileH);
 
+        this.leftFlag = false;
+        this.rightFlag = false;
+        this.left = 0;
+        this.right = 0;
+
+        this.move;
+        this.moveLeft;
+        this.moveRight;
+
         this.map = [];
 
         // How many times bigger than the screen
@@ -42,9 +51,9 @@ class World {
     generator() {
         // Initial generation
         this.slopes();
-        this.caves();
 
         // Second iteration of spawns
+        this.caves();
         this.rooms();
     }
 
@@ -78,8 +87,8 @@ class World {
 
                     this.map[i][j] = r(10, 1);
                     if (this.map[i][j] <= 5) this.map[i][j] = null;
-                    
-                } 
+
+                }
             }
         }
     }
@@ -88,12 +97,14 @@ class World {
         for (let i = 0; i < this.worldSize.sizeX; i++) {
             for (let j = 0; j < this.worldSize.sizeY; j++) {
                 if (j > this.topWorld[i] + 5) {
-                    if (!isNaN(this.map[i][j])) this.room(i, j);
+                    if (!isNaN(this.map[i][j])) {
+                        this.room(i, j);
+                    }
                 }
             }
         }
     }
-                
+
 
     room(vecX, vecY) {
         if (!this.map[vecX] || (!this.map[vecX + 1]) || (!this.map[vecX - 1])) return;
@@ -104,6 +115,7 @@ class World {
         }
         this.map[vecX][vecY] = "room";
         this.map[vecX + 1][vecY] = "room";
+        this.map[vecX - 1][vecY] = "room";
         this.map[vecX - 1][vecY - 1] = "room";
         this.map[vecX][vecY - 1] = "room";
         this.map[vecX][vecY + 1] = "room";
@@ -114,20 +126,37 @@ class World {
     }
 
     worldRender() {
-        for (let i = 0; i < (this.worldSize.sizeX); i++) {
-            for (let j = 0; j < (this.worldSize.sizeY); j++) {
+        // Rate of movement is obviously increasing because this.right/left is always increasing
+        for (let i = 0; i <= (this.worldSize.sizeX); i++) {
+            for (let j = 0; j <= (this.worldSize.sizeY); j++) {
+                
+                if (this.leftFlag) {
+                    this.move = f(i - this.left/100);
+                }
+                else if (this.rightFlag) {
+                    this.move = f(i + this.right/100);
+                }
+                if (!this.left && !this.right) {
+                    this.move = i;
+                }
 
-                if (j === this.topWorld[i]) World.addTexture("grass", i * (this.tileW + 1), j * (this.tileH + 1), this.tileW, this.tileH);
+                if (j === this.topWorld[i]) {
+                    World.addTexture("grass", this.move * (this.tileW), j * (this.tileH), this.tileW, this.tileH);
+                }
 
-                if (j === (this.topWorld[i] + 1)) World.addTexture("dirt", i * (this.tileW + 1), j * (this.tileH + 1), this.tileW, this.tileH);
+                if (j === (this.topWorld[i] + 1)) {
+                    World.addTexture("dirt", this.move * (this.tileW), j * (this.tileH), this.tileW, this.tileH);
+                }
+                 
 
                 // Stone rendering after 5 blocks from stone (+5 couting in height)
                 if (j > (this.topWorld[i])) {
-                    if (this.map[i][j] === "stone") World.addTexture("stone", i * (this.tileW + 1), j * (this.tileH + 1), this.tileW, this.tileH);
+                    if (this.map[i][j] === "stone") World.addTexture("stone", this.move * (this.tileW), j * (this.tileH), this.tileW, this.tileH);
                     // else if (this.map[i][j] === "room") World.addTexture("room", i * (this.tileW + 1), j * (this.tileH + 1), this.tileW, this.tileH);
                 }
             }
         }
+        this.move = 0;
     }
 
     static addTexture(tex, x, y, w, h) {
@@ -143,7 +172,7 @@ class World {
                 break;
             case "grass":
                 render.rect(x, y, w, h, "green");
-                break;    
+                break;
             default:
                 render.rect(x, y, w, h, "purple");
                 break;
