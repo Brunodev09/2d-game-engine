@@ -1,1 +1,1 @@
-# My take on a 2d tile based terrain generator.
+# My take on a 2d tile based game engine.
