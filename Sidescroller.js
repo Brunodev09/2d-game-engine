@@ -1,25 +1,18 @@
-class Landscape {
+class Sidescroller {
 
-    constructor(width, height, tileSizeX, tileSizeY) {
-
-        this.width = width;
-        this.height = height;
+    constructor(space, tileSizeX, tileSizeY) {
+        this.data = space;
         this.tileSizeX = tileSizeX;
         this.tileSizeY = tileSizeY;
-        this.data = new Space(width, height);
 
-        this.topWorld = arr(width);
-
-        // Initial generation
+        this.topWorld = arr(this.data.width);
+        
         this.slopes();
-        // Second iteration of spawns
+        this.flatWorld();
         this.caves();
         this.rooms();
     }
 
-    get returnSpace() {
-        return this.data;
-    }
 
     slopes() {
 
@@ -35,8 +28,6 @@ class Landscape {
             if (pos <= minPos) pos = minPos + r(4, 1);
             this.topWorld[x] = pos;
         }
-
-        this.flatWorld();
     }
 
     flatWorld() {
@@ -110,6 +101,14 @@ class Landscape {
         this.data.setBlock(new Point(vecX, vecY + 1), 'room');
         this.data.setBlock(new Point(vecX + 1, vecY - 1), 'room');
         this.data.setBlock(new Point(vecX + 1, vecY + 1), 'room');
+    }
+
+    forests() {
+        for (let i = 0; i < this.data.width; i++) {
+            for (let j = 0; j < this.data.height; j++) {
+
+            }
+        }
     }
 
 }

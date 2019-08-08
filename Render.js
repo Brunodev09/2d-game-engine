@@ -6,6 +6,46 @@ class Render {
         this.logger = false;
     }
 
+    static get COLOR_BROWN() {return "#654321"}
+    static get COLOR_GREY() {return "grey"}
+    static get COLOR_BLACK() {return "black"}
+    static get COLOR_GREEN() {return "green"}
+
+    worldRender(map, wTileCount, hTileCount, xOffset, yOffset, tileDimension) {
+        for (let i = 0; i <= wTileCount; i++) {
+            for (let j = 0; j <= hTileCount; j++) {
+                this.addTexture(i, j, map.getBlock(new Point(i, j)), xOffset, yOffset, tileDimension);
+            }
+        }
+    }
+
+    addTexture(xp, yp, tex, xOffset, yOffset, tileDimension) {
+
+        let xPos = (xOffset || 0) + (xp * tileDimension.width);
+        let yPos = (yOffset || 0) + (yp * tileDimension.height);
+
+        switch (tex) {
+            case "dirt":
+                this.rect(xPos, yPos, tileDimension.width, tileDimension.height, Render.COLOR_BROWN);
+                break;
+            case "stone":
+                this.rect(xPos, yPos, tileDimension.width, tileDimension.height, Render.COLOR_GREY);
+                break;
+            case "room":
+                this.rect(xPos, yPos, tileDimension.width, tileDimension.height, Render.COLOR_BLACK);
+                break;
+            case "grass":
+                this.rect(xPos, yPos, tileDimension.width, tileDimension.height, Render.COLOR_GREEN);
+                break;
+            case "void":
+                this.rect(xPos, yPos, tileDimension.width, tileDimension.height, Render.COLOR_BLACK);
+                break;
+            default:
+                this.rect(xPos, yPos, tileDimension.width, tileDimension.height, Render.COLOR_BLACK);
+                break;
+        }
+    }
+
     clear() {
         this.canvas.fillStyle = 'black';
         this.canvas.fillRect(0, 0, this.context.width, this.context.height);

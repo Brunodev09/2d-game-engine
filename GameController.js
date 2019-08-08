@@ -3,10 +3,10 @@ window.references = {};
 window.references.gc = {};
 
 class GameController {
-    constructor(worldInstance, renderInstance) {
+    constructor(renderInstance, worldInstance) {
         this.fps = 100;
-        this.worldInstance = worldInstance;
         this.renderInstance = renderInstance;
+        this.worldInstance = worldInstance;
         window.references.gc = this;
     }
 
@@ -20,36 +20,18 @@ class GameController {
     }
 
     render() {
-        if (!this.worldInstance) console.log('GC | No instance of the World class has been found!');
+        if (!this.renderInstance) console.log('GC | No instance of the Render class has been found!');
         this.renderInstance.clear();
-        this.worldInstance.worldRender();
+        this.renderInstance.worldRender(this.worldInstance.map, this.worldInstance.wTileCount, this.worldInstance.hTileCount, 0, 0, this.worldInstance.tileDimension);
     }
 
     keyboardController() {
         document.addEventListener('keydown', (event) => {
-            if (event.keyCode === 37) {
-                // left arrow
-                this.worldInstance.leftFlag = false;
-                this.worldInstance.rightFlag = true;
-            } 
-            else if (event.keyCode === 39) {
-                // right arrow
-                this.worldInstance.leftFlag = true;
-                this.worldInstance.rightFlag = false;
-            }
+
         });
 
         document.addEventListener('keyup', (event) => {
-            if (event.keyCode === 37) {
-                // left arrow
-                this.worldInstance.leftFlag = false;
-                this.worldInstance.rightFlag = false;
-            } 
-            else if (event.keyCode === 39) {
-                // right arrow
-                this.worldInstance.leftFlag = false;
-                this.worldInstance.rightFlag = false;
-            }
+
         });
     }
 
