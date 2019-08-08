@@ -26,18 +26,29 @@ class GameController {
     }
 
     keyboardController() {
-        document.addEventListener('keyup', (event) => {
+        document.addEventListener('keydown', (event) => {
             if (event.keyCode === 37) {
                 // left arrow
                 this.worldInstance.leftFlag = false;
                 this.worldInstance.rightFlag = true;
-                this.worldInstance.right++;
             } 
             else if (event.keyCode === 39) {
                 // right arrow
                 this.worldInstance.leftFlag = true;
                 this.worldInstance.rightFlag = false;
-                this.worldInstance.left++;
+            }
+        });
+
+        document.addEventListener('keyup', (event) => {
+            if (event.keyCode === 37) {
+                // left arrow
+                this.worldInstance.leftFlag = false;
+                this.worldInstance.rightFlag = false;
+            } 
+            else if (event.keyCode === 39) {
+                // right arrow
+                this.worldInstance.leftFlag = false;
+                this.worldInstance.rightFlag = false;
             }
         });
     }

@@ -2,180 +2,73 @@ let r = window.tools.rand;
 let f = window.tools.floor;
 let arr = window.tools.array;
 
+
 class World {
 
-    constructor(width, height, render) {
-        this.width = width;
-        this.height = height;
-        this.renderInstance = render;
-
-        this.tileW = 20;
-        this.tileH = 20;
-
-        // Tile sizes
-        this.tilesX = f(this.width / this.tileW);
-        this.tilesY = f(this.height / this.tileH);
-
-        this.leftFlag = false;
-        this.rightFlag = false;
-        this.left = 0;
-        this.right = 0;
-
-        this.move;
-        this.moveLeft;
-        this.moveRight;
-
-        this.map = [];
-
-        // How many times bigger than the screen
-        this.worldOffset = {
-            x: 1,
-            y: 1
-        }
-
-        this.worldSize = {
-            sizeX: this.tilesX * this.worldOffset.x,
-            sizeY: this.tilesY * this.worldOffset.y
-        }
-
-        // How many positions will be sorted to be the top of the world --> Must have width size
-        this.topWorld = arr(this.worldSize.sizeX);
+    static get DEFAULT_SCALE() {
+        return new Scale();
     }
 
-    fillMatrixes() {
-        for (let i = 0; i < this.worldSize.sizeX; i++) {
-            this.map[i] = arr(this.worldSize.sizeY);
-        }
+    static get DOUBLE_SCALE() {
+        return new Scale(5, 5);
     }
 
-    generator() {
-        // Initial generation
-        this.slopes();
+    constructor(width, height, tileSizeX, tileSizeY, render) {
+        // this.view = new View();
+        this.dimension = World.DOUBLE_SCALE.applyScale(width, height);
+        this.tileDimension = new Dimension(tileSizeX, tileSizeY);
 
-        // Second iteration of spawns
-        this.caves();
-        this.rooms();
+        this.map = new Space(width, height);
+
+        this.render = render;
+
     }
 
-    slopes() {
-
-        let minPos = 9;
-        let maxPos = 7;
-        // Dirt and top of the world - Time of iteractions must be defined by the width
-        // Since I'm selecting the top n times, I need it to fill at least the whole width
-        for (let x = 0; x < this.worldSize.sizeX; x++) {
-            let pos = r(this.tilesY);
-            // Position cannot be zero (No dirt in the sky plz)
-            if (!pos) pos = r(this.tilesY);
-            if (pos >= maxPos) pos = maxPos - r(6, 1);
-            if (pos <= minPos) pos = minPos + r(4, 1);
-            this.topWorld[x] = pos;
-        }
-        for (let i = 0; i < this.worldSize.sizeX; i++) {
-            for (let j = 0; j < this.worldSize.sizeY; j++) {
-                if (j > this.topWorld[i] + 1) this.map[i][j] = "stone";
-            }
-        }
+    get wTileCount() {
+        return f(this.dimension.width / this.tileDimension.width);
     }
 
-    caves() {
-
-        for (let i = 0; i < this.worldSize.sizeX; i++) {
-            for (let j = 0; j < this.worldSize.sizeY; j++) {
-
-                if (j > this.topWorld[i] + 5) {
-
-                    this.map[i][j] = r(10, 1);
-                    if (this.map[i][j] <= 5) this.map[i][j] = null;
-
-                }
-            }
-        }
-    }
-
-    rooms() {
-        for (let i = 0; i < this.worldSize.sizeX; i++) {
-            for (let j = 0; j < this.worldSize.sizeY; j++) {
-                if (j > this.topWorld[i] + 5) {
-                    if (!isNaN(this.map[i][j])) {
-                        this.room(i, j);
-                    }
-                }
-            }
-        }
-    }
-
-
-    room(vecX, vecY) {
-        if (!this.map[vecX] || (!this.map[vecX + 1]) || (!this.map[vecX - 1])) return;
-        if (!this.map[vecY] || (!this.map[vecY + 1]) || (!this.map[vecY - 1])) return;
-        if (!(r(10, 1) === 3)) {
-            this.map[vecX][vecY] = "stone";
-            return;
-        }
-        this.map[vecX][vecY] = "room";
-        this.map[vecX + 1][vecY] = "room";
-        this.map[vecX - 1][vecY] = "room";
-        this.map[vecX - 1][vecY - 1] = "room";
-        this.map[vecX][vecY - 1] = "room";
-        this.map[vecX][vecY + 1] = "room";
-        this.map[vecX - 1][vecY - 1] = "room";
-        this.map[vecX + 1][vecY - 1] = "room";
-        this.map[vecX + 1][vecY + 1] = "room";
-
+    get hTileCount() {
+        return f(this.dimension.height / this.tileDimension.height);
     }
 
     worldRender() {
         // Rate of movement is obviously increasing because this.right/left is always increasing
-        for (let i = 0; i <= (this.worldSize.sizeX); i++) {
-            for (let j = 0; j <= (this.worldSize.sizeY); j++) {
-                
-                if (this.leftFlag) {
-                    this.move = f(i - this.left/100);
-                }
-                else if (this.rightFlag) {
-                    this.move = f(i + this.right/100);
-                }
-                if (!this.left && !this.right) {
-                    this.move = i;
-                }
-
-                if (j === this.topWorld[i]) {
-                    World.addTexture("grass", this.move * (this.tileW), j * (this.tileH), this.tileW, this.tileH);
-                }
-
-                if (j === (this.topWorld[i] + 1)) {
-                    World.addTexture("dirt", this.move * (this.tileW), j * (this.tileH), this.tileW, this.tileH);
-                }
-                 
-
-                // Stone rendering after 5 blocks from stone (+5 couting in height)
-                if (j > (this.topWorld[i])) {
-                    if (this.map[i][j] === "stone") World.addTexture("stone", this.move * (this.tileW), j * (this.tileH), this.tileW, this.tileH);
-                    // else if (this.map[i][j] === "room") World.addTexture("room", i * (this.tileW + 1), j * (this.tileH + 1), this.tileW, this.tileH);
-                }
+        for (let i = 0; i <= this.wTileCount; i++) {
+            for (let j = 0; j <= this.hTileCount; j++) {
+                this.addTexture(i, j, this.map.getBlock(new Point(i, j)));
             }
         }
-        this.move = 0;
     }
 
-    static addTexture(tex, x, y, w, h) {
+    addTexture(xp, yp, tex) {
+
+        let xPos = (this.xPos || 0) + (xp * this.tileDimension.width);
+        let yPos = (this.yPos || 0) + (yp * this.tileDimension.height);
+
         switch (tex) {
             case "dirt":
-                render.rect(x, y, w, h, "#654321");
+                this.render.rect(xPos, yPos, this.tileDimension.width, this.tileDimension.height, "#654321");
                 break;
             case "stone":
-                render.rect(x, y, w, h, "grey");
+                this.render.rect(xPos, yPos, this.tileDimension.width, this.tileDimension.height, "grey");
                 break;
             case "room":
-                render.rect(x, y, w, h, "yellow");
+                this.render.rect(xPos, yPos, this.tileDimension.width, this.tileDimension.height, "black");
                 break;
             case "grass":
-                render.rect(x, y, w, h, "green");
+                this.render.rect(xPos, yPos, this.tileDimension.width, this.tileDimension.height, "green");
+                break;
+            case "void":
+                this.render.rect(xPos, yPos, this.tileDimension.width, this.tileDimension.height, "black");
                 break;
             default:
-                render.rect(x, y, w, h, "purple");
+                this.render.rect(xPos, yPos, this.tileDimension.width, this.tileDimension.height, "black");
                 break;
         }
+    }
+
+    apply(space, point) {
+        this.map.merge(space, point);
     }
 }
