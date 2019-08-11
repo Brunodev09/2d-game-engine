@@ -15,10 +15,13 @@ class World {
 
     constructor(width, height, tileSizeX, tileSizeY, render) {
         // this.view = new View();
-        this.dimension = World.DEFAULT_SCALE.applyScale(width, height);
+        this.dimension = World.DOUBLE_SCALE.applyScale(width, height);
         this.tileDimension = new Dimension(tileSizeX, tileSizeY);
 
-        this.map = new Space(this.dimension.width, this.dimension.height);
+        this.tileCountX = f(this.dimension.width/this.tileDimension.width);
+        this.tileCountY = f(this.dimension.width/this.tileDimension.height);
+
+        this.map = new Space(this.tileCountX, this.tileCountY);
 
         this.render = render;
 
