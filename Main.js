@@ -16,9 +16,9 @@ window.onload = function () {
 
     renderInstance = render(c, cx);
     world = allocateSpace(c.width, c.height, 20, 20, renderInstance);
-    allocateSpace = setWorld(50, 50, 1, 1, "sidescroller");
+    allocateSpace = setWorld(100, 100, 1, 1, "sidescroller");
     world.apply(allocateSpace.data, new Point(0, 0));
-    controller(renderInstance, world);
+    controller(renderInstance, world, new View(0, 0, 5));
 };
 
 function render(context, context2D) {
@@ -35,7 +35,7 @@ function setWorld(width, height, wTileCount, hTileCount, engine) {
     return display.Game;
 }
 
-function controller(render, world) {
-    gc = new GameController(render, world);
+function controller(render, world, view) {
+    gc = new GameController(render, world, view);
     gc.start();
 }

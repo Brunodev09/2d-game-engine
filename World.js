@@ -14,7 +14,6 @@ class World {
     }
 
     constructor(width, height, tileSizeX, tileSizeY, render) {
-        // this.view = new View();
         this.dimension = World.DOUBLE_SCALE.applyScale(width, height);
         this.tileDimension = new Dimension(tileSizeX, tileSizeY);
 
